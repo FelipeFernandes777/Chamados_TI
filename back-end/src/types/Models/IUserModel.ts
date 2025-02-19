@@ -1,19 +1,19 @@
 import { IUserLoginModel } from "./IUserLoginModel";
 import { ICallingModel } from "./ICallingModel";
 
-export interface IUserModel {
+export interface IUserModelDTO {
     id?: number;
     name: string;
-    department: Department;
-    enterprise: Enterprise;
-    role: string;
+    department: IDepartment;
+    enterprise: IEnterprise;
+    role: IRole;
     calling?: ICallingModel;
     login?: IUserLoginModel;
     created_at?: Date;
     updated_at?: Date;
 }
 
-export enum Department {
+export enum IDepartment {
     SECRETARIA = "SECRETARIA",
     VENDAS = "VENDAS",
     DOCUMENTOS = "DOCUMENTOS",
@@ -25,8 +25,13 @@ export enum Department {
     POSVENDAS = "POSVENDAS",
 }
 
-export enum Enterprise {
+export enum IEnterprise {
     FACULESTE = "FACULESTE",
     EDUCAMINAS = "EDUCAMINAS",
     FACUVALE = "FACUVALE"
+}
+
+export enum IRole {
+    COSTUMER = "COSTUMER",
+    ADMIN = "ADMIN",
 }

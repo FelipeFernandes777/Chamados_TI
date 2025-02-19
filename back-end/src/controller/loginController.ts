@@ -1,5 +1,6 @@
 import { AbstractLoginController } from "../types/Controller/loginController";
 import { Request, response, Response } from "express";
+import { z } from "zod";
 
 export class LoginController extends AbstractLoginController {
 
@@ -9,10 +10,27 @@ export class LoginController extends AbstractLoginController {
 
     public async register ( req: Request, res: Response ): Promise<Response> {
         try {
-            const id = req.params.id;
-            const { email, password } = req.body;
+            const { email, password, id } = req.body;
 
-            const user = await this.registerUser(parseInt(id), { email, password })
+            const loginSchema = z.object({
+                id: z.number().nonnegative(),
+                email: z.string().email(),
+                password: z.string().min(8).max(254)
+            })
+
+            const result = loginSchema.safeParse({ email, password, id })
+
+            console.log(result)
+
+            if (!result.success) {
+                return res.status(400).send({
+                    message: "Email or password is invalid",
+                    status: "alert"
+                })
+
+            }
+
+            const user = await this.registerUser(result.data.id, { email, password })
             return res.status(201).send({
                 status: 'success',
                 data: user,
@@ -32,7 +50,14 @@ export class LoginController extends AbstractLoginController {
 
             const { email, password } = req.body;
 
-            const token = await this.login({ email, password })
+            const token: string = await this.login({ email, password })
+
+            //Salvar o token no cookie
+            res.cookie("token", token, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000, // 1 Dia
+                sameSite: "strict", // Restrige ao site
+            });
 
             return res.status(200).send({
                 status: 'success',

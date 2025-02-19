@@ -1,5 +1,5 @@
 import { AbstractLoginService, IRegisterUser } from "../types/Service/loginService";
-import { IUserModel } from "../types/Models/IUserModel";
+import { IUserModelDTO } from "../types/Models/IUserModel";
 import { prisma } from "../config/dbConfig";
 import { compare, hash } from "bcrypt"
 
@@ -44,8 +44,9 @@ export class LoginService extends AbstractLoginService {
         return Promise.resolve(undefined);
     }
 
-    protected async registerUser ( id: number, data: IRegisterUser ): Promise<IUserModel> {
+    protected async registerUser ( id: number, data: IRegisterUser ): Promise<IUserModelDTO> {
         if (!id || !data.email || !data.password) {
+            console.log(data)
             throw new Error("Invalid Params")
         }
         try {

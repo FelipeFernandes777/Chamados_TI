@@ -4,7 +4,7 @@ import { LoginController } from "../controller/loginController";
 const loginRouter = Router();
 const loginController = new LoginController();
 
-loginRouter.post("/registrar/:id", ( req, res ) => {
+loginRouter.post("/registrar/", ( req, res ) => {
     loginController.register(req, res)
 })
     .post("/login", ( req, res ) => {

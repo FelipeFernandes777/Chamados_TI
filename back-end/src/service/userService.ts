@@ -1,11 +1,11 @@
 import { prisma } from "../config/dbConfig";
-import { IUserModel } from "../types/Models/IUserModel";
+import { IUserModelDTO } from "../types/Models/IUserModel";
 import { AbstractUserService, getUserOptions, IUpdatedUser } from "../types/Service/userService";
 
 export class UserService extends AbstractUserService {
     private readonly db = prisma;
 
-    protected async getAllUsers ( skip: number = 1, take: number = 10 ): Promise<IUserModel[]> {
+    protected async getAllUsers ( skip: number = 1, take: number = 10 ): Promise<IUserModelDTO[]> {
         try {
             return await this.db.user.findMany({
                 skip: (skip - 1) * take,
@@ -33,7 +33,7 @@ export class UserService extends AbstractUserService {
         }
     }
 
-    protected async getUserByIdOrNameOrDepartment ( data: getUserOptions ): Promise<IUserModel> {
+    protected async getUserByIdOrNameOrDepartment ( data: getUserOptions ): Promise<IUserModelDTO> {
         try {
             return await this.db.user.findFirst({
                 where: {
@@ -71,7 +71,7 @@ export class UserService extends AbstractUserService {
         }
     }
 
-    protected async updateUserById ( id: number, data: IUpdatedUser ): Promise<IUserModel> {
+    protected async updateUserById ( id: number, data: IUpdatedUser ): Promise<IUserModelDTO> {
         try {
             return await this.db.user.update({
                 where: {
@@ -90,7 +90,7 @@ export class UserService extends AbstractUserService {
         }
     }
 
-    protected async createUser ( data: IUserModel ): Promise<IUserModel> {
+    protected async createUser ( data: IUserModelDTO ): Promise<IUserModelDTO> {
         if (!data.name || !data.department || !data.enterprise || !data.role) {
             throw new Error("Missing required fields: name, department, enterprise, or role");
         }

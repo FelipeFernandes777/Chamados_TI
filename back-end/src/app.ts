@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { userRouter } from "./routes/userRouter";
 import bodyParser from "body-parser";
 import { loginRouter } from "./routes/loginRouter";
+import { setupSwagger } from "./documentation/swagger";
 
 export class App {
     private readonly app: Express;
@@ -20,6 +21,7 @@ export class App {
         this.app = express();
         this.app.use(bodyParser.json())
         this.initRouter()
+        setupSwagger(this.app)
     }
 
     public initServer () {

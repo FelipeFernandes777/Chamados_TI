@@ -1,15 +1,15 @@
-import { IUserModel } from "../Models/IUserModel";
+import { IUserModelDTO } from "../Models/IUserModel";
 
 export abstract class AbstractUserService {
-    protected abstract getAllUsers ( skip: number, take: number ): Promise<IUserModel[]>
+    protected abstract getAllUsers ( skip: number, take: number ): Promise<IUserModelDTO[]>
 
-    protected abstract getUserByIdOrNameOrDepartment ( data: getUserOptions ): Promise<IUserModel>
+    protected abstract getUserByIdOrNameOrDepartment ( data: getUserOptions ): Promise<IUserModelDTO>
 
     protected abstract deleteUserById ( id: number ): Promise<void>
 
-    protected abstract updateUserById ( id: number, data: IUpdatedUser ): Promise<IUserModel>
+    protected abstract updateUserById ( id: number, data: IUpdatedUser ): Promise<IUserModelDTO>
 
-    protected abstract createUser ( data: IUserModel ): Promise<IUserModel>
+    protected abstract createUser ( data: IUserModelDTO ): Promise<IUserModelDTO>
 }
 
 export interface getUserOptions {

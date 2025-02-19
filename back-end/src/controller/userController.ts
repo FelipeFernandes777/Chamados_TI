@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import { AbstractUserController } from "../types/Controller/userController";
-import { IUserModel } from "../types/Models/IUserModel";
+import { IDepartment, IEnterprise, IRole, IUserModelDTO } from "../types/Models/IUserModel";
+import { z } from "zod"
 
 export class UserController extends AbstractUserController {
     constructor () {
         super();
     }
 
-    public async getAll ( req: Request, res: Response ): Promise<Response<IUserModel[]>> {
+    public async getAll ( req: Request, res: Response ): Promise<Response<IUserModelDTO[]>> {
         try {
             const skip = parseInt(req.body.skip) || 1;
             const take = parseInt(req.body.take) || 10;
@@ -24,11 +25,27 @@ export class UserController extends AbstractUserController {
         }
     }
 
-    public async getById ( req: Request, res: Response ): Promise<Response<IUserModel>> {
+    public async getUser ( req: Request, res: Response ): Promise<Response<IUserModelDTO>> {
         try {
             const { id, name, department } = req.body;
 
-            const user = await this.getUserByIdOrNameOrDepartment({ id, name, department });
+            const getUser = z.object({
+                id: z.number().min(1).nonnegative(),
+                name: z.string().min(8).max(254),
+                department: z.nativeEnum(IDepartment)
+            })
+
+            const result = getUser.safeParse({ id, name, department });
+
+            if (!result.success) {
+                return res.status(400).send({
+                    message: "Id or name or department is invalid",
+                    status: "alert",
+                    statusCode: 400
+                })
+            }
+
+            const user = await this.getUserByIdOrNameOrDepartment(result);
             return res.status(200).send({
                 data: user,
                 status: 'success',
@@ -64,12 +81,30 @@ export class UserController extends AbstractUserController {
 
     }
 
-    public async update ( req: Request, res: Response ): Promise<Response<IUserModel>> {
+    public async update ( req: Request, res: Response ): Promise<Response<IUserModelDTO>> {
         try {
             const { id } = req.params
             const { name, department, enterprise, role } = req.body;
 
-            const user = await this.updateUserById(parseInt(id), { name, department, enterprise, role })
+            const getUser = z.object({
+                name: z.string().min(8).max(254),
+                department: z.nativeEnum(IDepartment),
+                enterprise: z.nativeEnum(IEnterprise),
+                role: z.nativeEnum(IRole)
+            })
+
+            const result = getUser.safeParse({ name, department, enterprise, role });
+
+            if (!result.success) {
+                return res.status(400).send({
+                    message: "One or more values is invalid",
+                    status: "alert",
+                    statusCode: 400,
+                    error: result.error.format()
+                })
+            }
+
+            const user = await this.updateUserById(parseInt(id), result)
 
             return res.status(200).send({
                 data: user,
@@ -82,13 +117,32 @@ export class UserController extends AbstractUserController {
         }
     }
 
-    public async create ( req: Request, res: Response ): Promise<Response<IUserModel>> {
+    public async create ( req: Request, res: Response ): Promise<Response<IUserModelDTO>> {
         try {
             const { name, department, enterprise, role } = req.body
 
             console.log(req.body)
 
-            const user = await this.createUser({ name, department, enterprise, role })
+            const getUser = z.object({
+                name: z.string().min(8).max(254),
+                department: z.nativeEnum(IDepartment),
+                enterprise: z.nativeEnum(IEnterprise),
+                role: z.nativeEnum(IRole)
+            })
+
+            const result = getUser.safeParse({ name, department, enterprise, role });
+
+            console.log("Result: ", result)
+
+            if (!result.success) {
+                return res.status(400).send({
+                    message: "One or more values is invalid",
+                    status: "alert",
+                    statusCode: 400
+                })
+            }
+
+            const user = await this.createUser({ name, department, enterprise, role });
 
             return res.status(201).send({
                 status: 'success',
